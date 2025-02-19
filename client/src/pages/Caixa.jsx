@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
-import { BarcodeOutlined,TagOutlined,ShoppingCartOutlined, CreditCardOutlined, DollarOutlined, FileTextOutlined  } from '@ant-design/icons';
+import { BarcodeOutlined,TagOutlined,ShoppingCartOutlined,CheckCircleOutlined,ShoppingOutlined, CreditCardOutlined, DollarOutlined, FileTextOutlined  } from '@ant-design/icons';
 import { Input, Button} from 'antd';
 import placeholder from "../assets/placeholder.webp"
+import product from "../assets/product.avif"
 import "../pages/caixa.css"
 const { Search } = Input;
-
+import ProductItem from '../components/ProductItem';
 
 function Caixa() {
 
@@ -43,7 +44,11 @@ function Caixa() {
 
   <div className='list'>
 
-    bbdb
+    <ProductItem/>
+    <ProductItem/>
+    <ProductItem/>
+  
+
   </div>
 </div>
             </div>
@@ -52,25 +57,25 @@ function Caixa() {
                
             <div className="product-container">
       <div className="page-title">
-        <BarcodeOutlined style={{ fontSize: 25, marginRight: 5 }} />
-        <h2>Resumo da compra</h2>
+        <ShoppingOutlined  style={{ fontSize: 25, marginRight: 5 }} />
+        <h2>Detalhes do pedido</h2>
       </div>
 
-      <img className="product-img" src={placeholder} alt="Produto" />
+      <img className="product-img" src={product} alt="Produto" />
       
       <div className='product-details'>
 
         <div className='detail-item'>
           <TagOutlined style={{ fontSize: 20, marginRight: 10 }} />
-          <span className='detail-text'><strong>Nome do Produto:</strong> Produto Exemplo</span>
+          <span className='detail-text'><strong>Nome do Produto:</strong> Caixa de banana</span>
         </div>
         <div className='detail-item'>
           <DollarOutlined style={{ fontSize: 20, marginRight: 10 }} />
-          <span className='detail-text'><strong>Preço:</strong> R$ 150,00</span>
+          <span className='detail-text'><strong>Preço:</strong> R$ 59,90</span>
         </div>
         <div className='detail-item'>
           <BarcodeOutlined style={{ fontSize: 20, marginRight: 10 }} />
-          <span className='detail-text'><strong>Cod.produto:</strong> 123456</span>
+          <span className='detail-text'><strong>Cod.produto:</strong> 984919</span>
         </div>
       </div>
 
@@ -83,7 +88,7 @@ function Caixa() {
 
       <div className='details'>
         <span>Total: </span>
-        <span className='total-value'>R$ 150,00</span> {/* Exemplo de valor */}
+        <span className='total-value'>R$ 198,70</span> {/* Exemplo de valor */}
       </div>
 
       <div className='page-title'>
@@ -119,6 +124,7 @@ function Caixa() {
       </div>
 
       <Button type='primary' className='concluir-compra'>
+      <CheckCircleOutlined />
         Concluir Compra
       </Button>
     </div>
