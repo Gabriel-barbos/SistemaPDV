@@ -1,0 +1,17 @@
+
+.card-container{
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 280px;
+    background-color: rgb(119, 162, 201);
+    border-radius: 10px;
+    box-shadow: inset;
+}
+
+.card-img{
+height: 180px;
+width: 200px;    
+border-top-left-radius:10px ;
+border-top-right-radius:10px ;
+}

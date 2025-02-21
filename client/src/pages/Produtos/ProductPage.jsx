@@ -2,14 +2,14 @@ import React from 'react'
 import "./productpage.css"
 import {Button} from 'antd';
 import {ShoppingOutlined } from '@ant-design/icons';
-
+import ProductCard from '../../components/ProductCard';
 function ProductPage() {
   return (
     <>
  <div className="page-top">
         <div className="Page-title">
           <ShoppingOutlined style={{ fontSize: 25, marginRight: 5 }} />
-          <h1>Gerenciar Usuários</h1>
+          <h1>Gerenciar Produtos</h1>
         </div>
         <Button
           type="primary"
@@ -22,7 +22,7 @@ function ProductPage() {
       </div>
 
 <div className='product-list'>
-    
+    <ProductCard/>
 </div>
 
 
