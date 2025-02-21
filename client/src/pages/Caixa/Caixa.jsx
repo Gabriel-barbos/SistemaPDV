@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import { BarcodeOutlined,TagOutlined,ShoppingCartOutlined,CheckCircleOutlined,ShoppingOutlined, CreditCardOutlined, DollarOutlined, FileTextOutlined  } from '@ant-design/icons';
 import { Input, Button} from 'antd';
-import placeholder from "../assets/placeholder.webp"
-import product from "../assets/product.avif"
-import "../pages/caixa.css"
+import placeholder from "../../assets/placeholder.webp"
+import product from "../../assets/product.avif"
+import "../Caixa/caixa.css"
 const { Search } = Input;
-import ProductItem from '../components/ProductItem';
+import ProductItem from '../../components/ProductItem';
 
 function Caixa() {
 
