@@ -1,7 +1,6 @@
 .Page-title {
     display: flex;
     align-items: center; /* Alinha verticalmente os elementos */
-    justify-content: center; /* Alinha horizontalmente os elementos */
   }
   
   .Page-title h1 {
