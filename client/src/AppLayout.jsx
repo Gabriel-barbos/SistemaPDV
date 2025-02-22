@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './main.css';
 import {
   PieChartOutlined,
@@ -6,71 +7,52 @@ import {
   AppstoreOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons';
-
 import { Layout, Menu } from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
 
-function getItem(label, key, icon, children) {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  };
-}
+const { Content, Footer, Sider } = Layout;
 
 const items = [
-  getItem('Caixa', '1', <ShoppingCartOutlined />),
-  getItem('Produtos', '2', <TagOutlined />),
-  getItem('Estoque', '3', <AppstoreOutlined />),
-  getItem('Relátorios', '4', <PieChartOutlined />),
+  { key: "1", label: "Caixa", icon: <ShoppingCartOutlined />, path: "/caixa" },
+  { key: "2", label: "Produtos", icon: <TagOutlined />, path: "/admin/produtos" },
+  { key: "3", label: "Estoque", icon: <AppstoreOutlined />, path: "/admin/estoque" },
+  { key: "4", label: "Relatórios", icon: <PieChartOutlined />, path: "/admin/envios" },
 ];
 
 const AppLayout = ({ children, selectedKey }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate(); // Hook para navegação
+
+  const handleMenuClick = (e) => {
+    const selectedItem = items.find(item => item.key === e.key);
+    if (selectedItem) {
+      navigate(selectedItem.path); // Faz a navegação para a rota correspondente
+    }
+  };
 
   return (
-    <Layout
-      style={{
-        minHeight: '100vh',
-        background: '#e0e0e0', // Cor de fundo do layout principal
-      }}
-    >
+    <Layout style={{ minHeight: '100vh', background: '#e0e0e0' }}>
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        style={{
-          background: '#002140', // Cor personalizada para o menu lateral
-        }}
+        style={{ background: '#002140' }}
       >
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[selectedKey]} // Mantém a aba selecionada
+          onClick={handleMenuClick} // Captura os cliques no menu
+          items={items}
+        />
       </Sider>
       <Layout>
-        <Content
-          style={{
-            margin: '0 16px',
-          }}
-        >
-          <div
-            style={{
-              padding: 24,
-              minHeight: 360,
-              background: '#f0f2f5', // Cor personalizada para o conteúdo
-              borderRadius: '8px', // Caso queira arredondar mais as bordas
-            }}
-          >
+        <Content style={{ margin: '0 16px' }}>
+          <div style={{ padding: 24, minHeight: 360, background: '#f0f2f5', borderRadius: '8px' }}>
             {children}
           </div>
         </Content>
-        <Footer
-          style={{
-            textAlign: 'center',
-            background: '#001529', // Cor personalizada para o rodapé
-            color: '#fff', // Cor do texto no rodapé
-          }}
-        >
+        <Footer style={{ textAlign: 'center', background: '#001529', color: '#fff' }}>
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
         </Footer>
       </Layout>

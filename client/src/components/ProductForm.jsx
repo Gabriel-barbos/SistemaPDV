@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input, Button, InputNumber, Upload, Space, Row, Col } from 'antd';
-import { EditOutlined, DollarOutlined, TagsOutlined, BarcodeOutlined, UploadOutlined } from '@ant-design/icons';
+import { EditOutlined, DollarOutlined,FieldNumberOutlined, TagsOutlined, BarcodeOutlined, UploadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
@@ -57,6 +57,18 @@ const ProductForm = () => {
               placeholder="Nome do Produto"
             />
           </Form.Item>
+
+          <Form.Item
+            label="Quantidade do Produto"
+            name="productName"
+            rules={[{ required: true, message: 'Por favor, insira a quantidade do produto!' }]}
+          >
+            <Input
+              prefix={<FieldNumberOutlined />}
+              placeholder="Quantidade do Produto"
+            />
+          </Form.Item>
+
         </Col>
 
         {/* Campo Preço */}

@@ -3,6 +3,7 @@ import "./productpage.css"
 import {Button, Drawer} from 'antd';
 import {ShoppingOutlined } from '@ant-design/icons';
 import ProductForm from '../../components/ProductForm';
+import ProductCard from '../../components/ProductCard';
 function ProductPage() {
   const [open, setOpen] = useState(false);
 const showDrawer = () => {
@@ -35,6 +36,8 @@ const onClose = () => {
       </Drawer>
 
 <div className='product-list'>
+    <ProductCard/>
+    <ProductCard/>
     <ProductCard/>
 </div>
 
