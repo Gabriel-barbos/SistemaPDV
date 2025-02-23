@@ -3,20 +3,6 @@ const router = express.Router();
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
 
-/*
-  Endpoint: POST /sales
-  Formato esperado no corpo da requisição:
-  {
-    "items": [
-      { "productId": "id_do_produto", "quantity": quantidade_vendida },
-      ...
-    ],
-    "payment": {
-      "method": "dinheiro" ou "cartão",
-      "details": "detalhes do pagamento, se houver"
-    }
-  }
-*/
 router.post('/', async (req, res) => {
   try {
     const { items, payment } = req.body;
