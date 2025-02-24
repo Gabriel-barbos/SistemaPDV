@@ -53,6 +53,7 @@ function Caixa() {
 </div>
             </div>
 
+
             <div className='right-page'>
                
             <div className="product-container">
@@ -130,6 +131,7 @@ function Caixa() {
     </div>
             </div>
         </div>
+        
     </div>
   )
 }

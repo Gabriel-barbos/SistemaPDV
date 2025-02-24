@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
-import "./productpage.css"
-import { Button, Drawer } from 'antd';
-import { ShoppingOutlined } from '@ant-design/icons';
+import "./productpage.css";
+import { Button, Drawer, Spin, Alert } from 'antd';
+import { ShoppingOutlined,PlusCircleOutlined } from '@ant-design/icons';
 import ProductForm from '../../components/ProductForm';
-import ProductCard from '../../components/ProductCard';
-
-
 function ProductPage() {
 
 
   const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
+const showDrawer = () => {
+  setOpen(true);
+};
+const onClose = () => {
+  setOpen(false);
+};
 
   return (
     <>
@@ -26,26 +23,24 @@ function ProductPage() {
         </div>
         <Button
           type="primary"
-          shape="primary"
-          icon={<ShoppingOutlined />}
+          icon={<PlusCircleOutlined />}
           onClick={showDrawer}
-          size={26}
         >
           Adicionar novo
         </Button>
       </div>
 
       <Drawer title="Cadastrar novo produto" onClose={onClose} open={open}>
-        <ProductForm />
+      <ProductForm/>
       </Drawer>
 
-      <div className='product-list'>
-        <ProductCard />
-      </div>
+<div className='product-list'>
+    <ProductCard/>
+</div>
 
 
     </>
-  )
+  );
 }
 
-export default ProductPage
+export default ProductPage;

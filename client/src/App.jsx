@@ -20,6 +20,14 @@ function App() {
             }
           />
 
+          <Route
+            path="/admin/estoque"
+            element={
+              <AppLayout selectedKey="5">
+                  <Estoque/>
+            </AppLayout>           
+            }
+          />
                <Route
             path="/admin/produtos"
             element={
@@ -34,15 +42,6 @@ function App() {
             element={
                 <Login/>
            
-            }
-          />
-
-<Route
-            path="/admin/estoque"
-            element={
-              <AppLayout selectedKey="5">
-                  <Estoque/>
-            </AppLayout>           
             }
           />
        

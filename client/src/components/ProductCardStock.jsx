@@ -1,65 +1,66 @@
 import React, { useState } from 'react';
 import { Card, Statistic, Button, Input, Tooltip } from 'antd';
-import { ReloadOutlined,EditFilled } from '@ant-design/icons'; // Ícone de "reload"
+import { EditFilled } from '@ant-design/icons';
 import CountUp from 'react-countup';
 
 const formatter = (value) => <CountUp end={value} />;
 
-function ProductCardStock() {
-  // Estado para a quantidade
-  const [quantity, setQuantity] = useState(114);
-  // Estado para controlar o valor do input
+function ProductCardStock({ produto, updateProductQuantity }) {
   const [inputValue, setInputValue] = useState('');
-  // Estado para controlar a visibilidade do input
   const [isInputVisible, setIsInputVisible] = useState(false);
 
-  // Função para atualizar a quantidade com o valor inserido pelo usuário
   const updateQuantity = () => {
-    if (inputValue && !isNaN(inputValue)) {
-      setQuantity(Number(inputValue)); // Atualiza a quantidade com o valor do input
-      setInputValue(''); // Limpa o campo de input após a atualização
-      setIsInputVisible(false); // Esconde o input após atualizar
+    if (inputValue && !isNaN(inputValue) && Number(inputValue) >= 0) {
+      console.log(`Updating product ${produto._id} with quantity ${inputValue}`);
+      updateProductQuantity(produto._id, Number(inputValue))
+        .then(() => {
+          console.log('Update successful');
+          setInputValue('');
+          setIsInputVisible(false);
+        })
+        .catch((error) => {
+          console.error('Update failed', error);
+          alert('Falha ao atualizar a quantidade. Tente novamente.');
+        });
     } else {
-      alert("Por favor, insira um valor válido."); // Validação simples
+      alert("Por favor, insira um valor válido.");
     }
   };
 
-  // Função para mostrar o input quando o ícone for clicado
   const handleUpdateClick = () => {
-    setIsInputVisible(true); // Exibe o campo de input
+    setIsInputVisible(true);
   };
 
   return (
     <div>
       <Card
-        title="Caderno infantil"
-        variant="borderless"
+        title={produto.name}
         extra={
           <Tooltip title="Atualizar quantidade">
-            {/* Ícone de reload para indicar a atualização */}
             <EditFilled onClick={handleUpdateClick} style={{ fontSize: 20, cursor: 'pointer' }} />
           </Tooltip>
         }
         style={{
           width: 250,
+          margin: '10px',
         }}
         bodyStyle={{
-          paddingTop: '5px', // Reduz o padding superior do conteúdo
-          paddingBottom: '20px', // Aumenta o padding inferior do conteúdo
-          paddingLeft: '15px',  // Ajuste no padding esquerdo do conteúdo
-          paddingRight: '15px', // Ajuste no padding direito do conteúdo
+          paddingTop: '5px',
+          paddingBottom: '20px',
+          paddingLeft: '15px',
+          paddingRight: '15px',
         }}
       >
-        <Statistic title="Quantidade" value={quantity} formatter={formatter} />
+        <Statistic title="Quantidade" value={produto.quantity} formatter={formatter} />
         
-        {/* Exibe o Input somente se o estado isInputVisible for true */}
         {isInputVisible && (
           <div style={{ marginTop: 10 }}>
             <Input
               type="number"
               placeholder="Insira novo valor"
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)} // Atualiza o valor do input
+              onChange={(e) => setInputValue(e.target.value)}
+              min="0"
             />
             <Button 
               type="primary" 
