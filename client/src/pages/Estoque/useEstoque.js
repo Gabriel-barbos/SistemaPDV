@@ -25,12 +25,16 @@ const useEstoque = () => {
   const updateProductQuantity = async (id, quantity) => {
     try {
       const response = await axios.patch(`${API_URL}/${id}`, { quantity });
-      // Atualiza o estado local com a nova quantidade do produto
-      setEstoque(prevEstoque =>
-        prevEstoque.map(produto =>
-          produto._id === id ? response.data : produto
-        )
-      );
+  
+      if (response.status === 200) {
+        setEstoque(prevEstoque =>
+          prevEstoque.map(produto =>
+            produto._id === id ? { ...produto, quantity } : produto
+          )
+        );
+      } else {
+        console.error('Erro ao atualizar a quantidade do produto');
+      }
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     }

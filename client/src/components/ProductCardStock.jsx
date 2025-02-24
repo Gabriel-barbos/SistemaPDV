@@ -1,31 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Statistic, Button, Input, Tooltip } from 'antd';
 import { EditFilled } from '@ant-design/icons';
 import CountUp from 'react-countup';
 
 const formatter = (value) => <CountUp end={value} />;
 
-function ProductCardStock({ produto, updateProductQuantity }) {
+function ProductCardStock({ produto, updateProduct }) {
   const [inputValue, setInputValue] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
+  const [quantity, setQuantity] = useState(produto.quantity);
 
+  useEffect(() => {
+    setQuantity(produto.quantity);
+  }, [produto.quantity]); // Atualiza quando a prop muda
+  
   const updateQuantity = () => {
     if (inputValue && !isNaN(inputValue) && Number(inputValue) >= 0) {
-      console.log(`Updating product ${produto._id} with quantity ${inputValue}`);
-      updateProductQuantity(produto._id, Number(inputValue))
+      updateProduct(produto._id, { quantity: Number(inputValue) })
         .then(() => {
-          console.log('Update successful');
+          setQuantity(Number(inputValue)); // Atualiza localmente a exibição
           setInputValue('');
           setIsInputVisible(false);
         })
         .catch((error) => {
           console.error('Update failed', error);
-          alert('Falha ao atualizar a quantidade. Tente novamente.');
+          alert('Falha ao atualizar a quantidade.');
         });
     } else {
       alert("Por favor, insira um valor válido.");
     }
   };
+  
 
   const handleUpdateClick = () => {
     setIsInputVisible(true);
@@ -51,7 +56,7 @@ function ProductCardStock({ produto, updateProductQuantity }) {
           paddingRight: '15px',
         }}
       >
-        <Statistic title="Quantidade" value={produto.quantity} formatter={formatter} />
+        <Statistic title="Quantidade" value={quantity} formatter={formatter} />
         
         {isInputVisible && (
           <div style={{ marginTop: 10 }}>

@@ -3,16 +3,27 @@ import "./productpage.css";
 import { Button, Drawer, Spin, Alert } from 'antd';
 import { ShoppingOutlined,PlusCircleOutlined } from '@ant-design/icons';
 import ProductForm from '../../components/ProductForm';
+import ProductCard from '../../components/ProductCard';
+import useProducts from '../Produtos/useProducts';
+
 function ProductPage() {
-
-
   const [open, setOpen] = useState(false);
-const showDrawer = () => {
-  setOpen(true);
-};
-const onClose = () => {
-  setOpen(false);
-};
+  const { products, loading, error, createProduct } = useProducts(); // Hook para gerenciar os produtos
+  const [btnLoading, setBtnLoading] = useState(false); // Estado para controlar o loading do botão de criar
+
+  const showDrawer = () => setOpen(true);
+  const onClose = () => setOpen(false);
+
+  const handleCreateProduct = async (productData) => {
+    setBtnLoading(true); // Ativa o carregamento do botão
+    try {
+      await createProduct(productData); // Chama a função do hook para criar o produto
+      onClose(); // Fecha o Drawer após o produto ser criado
+    } catch (err) {
+      // Se ocorrer um erro, a variável btnLoading ficará falsa e o erro pode ser tratado
+      setBtnLoading(false);
+    }
+  };
 
   return (
     <>
@@ -24,21 +35,34 @@ const onClose = () => {
         <Button
           type="primary"
           icon={<PlusCircleOutlined />}
+
           onClick={showDrawer}
+
         >
           Adicionar novo
         </Button>
       </div>
 
       <Drawer title="Cadastrar novo produto" onClose={onClose} open={open}>
-      <ProductForm/>
+        <ProductForm onSubmit={handleCreateProduct} btnLoading={btnLoading} />
       </Drawer>
 
-<div className='product-list'>
-    <ProductCard/>
-</div>
+      {/* Exibir carregamento ou erro */}
+      {loading && <Spin size="large" />}
+      {error && <Alert message="Erro ao carregar produtos" type="error" showIcon />}
 
 
+
+
+      <div className="product-list">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))
+        ) : (
+          !loading && <p>Nenhum produto encontrado.</p>
+        )}
+      </div>
     </>
   );
 }

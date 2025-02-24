@@ -65,7 +65,7 @@ function ProductCard({ product }) {
       <Button
         type="primary"
         icon={<EyeOutlined />}
-        style={{ backgroundColor: '#4c86af', borderColor: '#f7f7f7', color: 'white' }}
+        style={{ backgroundColor: '#', borderColor: '#f7f7f7', color: 'white' }}
         onClick={showDrawer}
       >
         Ver detalhes

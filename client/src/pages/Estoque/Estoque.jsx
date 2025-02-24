@@ -1,37 +1,31 @@
-import React from 'react'
-import {Card} from 'antd';
-import {ShoppingOutlined,ProductOutlined  } from '@ant-design/icons';
+import React from 'react';
+import { Card } from 'antd';
+import { ShoppingOutlined } from '@ant-design/icons';
 import ProductCardStock from '../../components/ProductCardStock';
-import "./Estoque.css"
-import useEstoque from '../Estoque/useEstoque';
-
+import './Estoque.css';
+import useProducts from '../Produtos/useProducts';
 
 function Estoque() {
-  const { estoque, loading, error, updateProductQuantity } = useEstoque();
-
+  const { products, loading, error, updateProduct } = useProducts();
 
   return (
-  <div>
- 
-        <div className="Page-title">
-          <ShoppingOutlined style={{ fontSize: 25, marginRight: 5 }} />
-          <h1>Estoque</h1>
-        </div>
-     
+    <div>
+      <div className="Page-title">
+        <ShoppingOutlined style={{ fontSize: 25, marginRight: 5 }} />
+        <h1>Estoque</h1>
+      </div>
+
       <div className='stock-list'>
-        
-     {estoque.map(produto => (
+        {products.map((produto) => (
           <ProductCardStock 
             key={produto._id} 
             produto={produto} 
-            updateProductQuantity={updateProductQuantity} 
+            updateProduct={updateProduct} 
           />
         ))}
-
       </div>
-
-</div>
-  )
+    </div>
+  );
 }
 
-export default Estoque
+export default Estoque;
