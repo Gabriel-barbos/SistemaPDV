@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import "./productpage.css"
-import {Button, Drawer} from 'antd';
-import {ShoppingOutlined } from '@ant-design/icons';
+import { Button, Drawer } from 'antd';
+import { ShoppingOutlined } from '@ant-design/icons';
 import ProductForm from '../../components/ProductForm';
+import ProductCard from '../../components/ProductCard';
+
+
 function ProductPage() {
+
+
   const [open, setOpen] = useState(false);
-const showDrawer = () => {
-  setOpen(true);
-};
-const onClose = () => {
-  setOpen(false);
-};
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
 
   return (
     <>
- <div className="page-top">
+      <div className="page-top">
         <div className="Page-title">
           <ShoppingOutlined style={{ fontSize: 25, marginRight: 5 }} />
           <h1>Gerenciar Produtos</h1>
@@ -31,12 +36,12 @@ const onClose = () => {
       </div>
 
       <Drawer title="Cadastrar novo produto" onClose={onClose} open={open}>
-      <ProductForm/>
+        <ProductForm />
       </Drawer>
 
-<div className='product-list'>
-    <ProductCard/>
-</div>
+      <div className='product-list'>
+        <ProductCard />
+      </div>
 
 
     </>
