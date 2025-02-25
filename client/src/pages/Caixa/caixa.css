@@ -145,8 +145,16 @@ border-radius: 10px;
 .detail-item {
   display: flex;
   align-items: center; /* Alinha o ícone e o texto verticalmente */
+  justify-content: center;
 }
 
 .detail-text {
   font-size: 18px; /* Aumenta o tamanho do texto */
+
+}
+
+.empty-text{
+  font-size: 20px;
+  font-weight: 600;
+  
 }

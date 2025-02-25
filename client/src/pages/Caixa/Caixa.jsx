@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarcodeOutlined,
   TagOutlined,
@@ -9,50 +9,97 @@ import {
   DollarOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import { Input, Button, List } from "antd";
+import { Input, Button, List, message } from "antd";
 import product from "../../assets/product.avif";
+import emptyGIF from "../../assets/emptyGIF.gif"
 import "../Caixa/caixa.css";
 const { Search } = Input;
 import ProductItem from "../../components/ProductItem";
+import useProducts from "../Produtos/useProducts";
 
 function Caixa() {
+
+
+  const { products, fetchProducts } = useProducts();
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  // Cada item terá { product, quantity }
+  const [purchaseList, setPurchaseList] = useState([]);
 
-  // Mock de produtos (simulação de dados que viriam do backend)
-  const products = [
-    { id: 1, name: "Caixa de banana", barcode: "984919", price: "59,90" },
-    { id: 2, name: "Leite Integral", barcode: "123456", price: "5,90" },
-    { id: 3, name: "Pão Francês", barcode: "789012", price: "10,50" },
-    { id: 4, name: "Arroz Branco", barcode: "345678", price: "22,90" },
-  ];
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+
+  const handleRemoveProduct = (indexToRemove) => {
+    setPurchaseList((prevList) =>
+      prevList.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
+  const handleQuantityChange = (index, newQuantity) => {
+    setPurchaseList((prevList) => {
+      const newList = [...prevList];
+      newList[index].quantity = newQuantity;
+      return newList;
+    });
+  };
 
   const handlePaymentSelect = (paymentType) => {
     setSelectedPayment(paymentType === selectedPayment ? null : paymentType);
   };
 
-  // Função para buscar produtos ao digitar
   const handleSearch = (value) => {
     setSearchTerm(value);
-    if (value.length === 0) {
+    setSelectedProduct(null);
+    if (!value.trim()) {
       setFilteredProducts([]);
       return;
     }
 
-    const filtered = products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(value.toLowerCase()) ||
-        product.barcode.includes(value)
+    const filtered = products.filter((product) =>
+      product.name?.toLowerCase().includes(value.toLowerCase()) ||
+      product.BarCode?.includes(value)
     );
     setFilteredProducts(filtered);
   };
 
-  // Função para selecionar um produto da lista de sugestões
   const handleSelectProduct = (product) => {
     setSearchTerm(product.name);
-    setFilteredProducts([]); // Esconde a lista após a seleção
+    setSelectedProduct(product);
+    setFilteredProducts([]);
   };
+
+  const handleAddProduct = () => {
+    if (selectedProduct) {
+      // Se o produto já estiver na lista, incrementa sua quantidade
+      const index = purchaseList.findIndex(
+        (item) => item.product._id === selectedProduct._id
+      );
+      if (index !== -1) {
+        handleQuantityChange(index, purchaseList[index].quantity + 1);
+      } else {
+        setPurchaseList((prev) => [...prev, { product: selectedProduct, quantity: 1 }]);
+      }
+      setSearchTerm("");
+      setSelectedProduct(null);
+      message.success("Produto adicionado à lista de compra!");
+    } else {
+      message.error("Selecione um produto da lista de sugestões.");
+    }
+  };
+
+  // Calcula o total somando (preço * quantidade) de cada item
+  const totalValue = purchaseList.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  );
+
+  // Último produto adicionado (para exibir os detalhes)
+  const lastProduct =
+    purchaseList.length > 0 ? purchaseList[purchaseList.length - 1].product : null;
 
   return (
     <div className="page-container">
@@ -69,8 +116,8 @@ function Caixa() {
             size="large"
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
+            onSearch={handleAddProduct}
           />
-          {/* Exibição das sugestões */}
           {filteredProducts.length > 0 && (
             <List
               className="autocomplete-list"
@@ -93,9 +140,17 @@ function Caixa() {
             <h2> Lista de compra</h2>
           </div>
           <div className="list">
-            <ProductItem />
-            <ProductItem />
-            <ProductItem />
+            {purchaseList.map((item, index) => (
+              <ProductItem
+                key={index}
+                product={item.product}
+                quantity={item.quantity}
+                onQuantityChange={(newQuantity) =>
+                  handleQuantityChange(index, newQuantity)
+                }
+                onRemove={() => handleRemoveProduct(index)}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -106,27 +161,51 @@ function Caixa() {
             <ShoppingOutlined style={{ fontSize: 25, marginRight: 5 }} />
             <h2>Detalhes do pedido</h2>
           </div>
-          <img className="product-img" src={product} alt="Produto" />
-          <div className="product-details">
-            <div className="detail-item">
-              <TagOutlined style={{ fontSize: 20, marginRight: 10 }} />
-              <span className="detail-text">
-                <strong>Nome do Produto:</strong> Caixa de banana
-              </span>
-            </div>
-            <div className="detail-item">
-              <DollarOutlined style={{ fontSize: 20, marginRight: 10 }} />
-              <span className="detail-text">
-                <strong>Preço:</strong> R$ 59,90
-              </span>
-            </div>
-            <div className="detail-item">
-              <BarcodeOutlined style={{ fontSize: 20, marginRight: 10 }} />
-              <span className="detail-text">
-                <strong>Cod.produto:</strong> 984919
-              </span>
-            </div>
-          </div>
+          {lastProduct ? (
+            <>
+              <img
+                className="product-img"
+                src={
+                  lastProduct.image && lastProduct.image.length > 0
+                    ? lastProduct.image[0]
+                    : product
+                }
+                alt="Produto"
+              />
+              <div className="product-details">
+                <div className="detail-item">
+                  <TagOutlined style={{ fontSize: 20, marginRight: 10 }} />
+                  <span className="detail-text">
+                    <strong>Nome do Produto:</strong> {lastProduct.name}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <DollarOutlined style={{ fontSize: 20, marginRight: 10 }} />
+                  <span className="detail-text">
+                    <strong>Preço:</strong> R$ {lastProduct.price}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <BarcodeOutlined style={{ fontSize: 20, marginRight: 10 }} />
+                  <span className="detail-text">
+                    <strong>Cod.produto:</strong> {lastProduct.code || lastProduct.BarCode}
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              
+              <img className="product-img" src={emptyGIF} alt="Produto" />
+              <div className="product-details">
+                <div className="detail-item">
+                  <span className="empty-text">
+                   Nenhum produto adicionado 
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="total-container">
@@ -136,7 +215,12 @@ function Caixa() {
           </div>
           <div className="details">
             <span>Total: </span>
-            <span className="total-value">R$ 198,70</span>
+            <span className="total-value">
+              {totalValue.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </span>
           </div>
 
           <div className="page-title">
