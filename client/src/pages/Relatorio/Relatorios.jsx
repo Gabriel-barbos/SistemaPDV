@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "../Relatorio/relatorio.css";
-import { PieChartOutlined } from '@ant-design/icons';
+import { PieChartOutlined, ContainerOutlined } from '@ant-design/icons';
 import { Statistic, Tabs } from "antd";
 import GeneralTable from '../../components/GeneralTable';
 import TodaySalesTable from '../../components/TodaySalesTable';
@@ -167,7 +167,7 @@ function Relatorios() {
       </div>
 
       <div className="Page-title">
-        <PieChartOutlined style={{ fontSize: 25, marginRight: 5 }} />
+      <ContainerOutlined style={{ fontSize: 25, marginRight: 5 }} />
         <h1>Historico</h1>
       </div>
 

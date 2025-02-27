@@ -53,7 +53,7 @@ const AppLayout = ({ children, selectedKey }) => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center', background: '#001529', color: '#fff' }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+           ©{new Date().getFullYear()} Created by Gabriel Barbosa
         </Footer>
       </Layout>
     </Layout>

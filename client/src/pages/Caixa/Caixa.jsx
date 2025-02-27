@@ -25,12 +25,15 @@ function Caixa() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  // Cada item terá { product, quantity }
   const [purchaseList, setPurchaseList] = useState([]);
-  // Estado para controle do modal de venda confirmada
   const [saleConfirmed, setSaleConfirmed] = useState(false);
-  // Estado para controle do carregamento na conclusão da venda
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Estados para dados adicionais de pagamento
+  const [fiadoName, setFiadoName] = useState("");
+  const [dinheiroModalVisible, setDinheiroModalVisible] = useState(false);
+  const [dinheiroReceived, setDinheiroReceived] = useState("");
+  const [dinheiroTroco, setDinheiroTroco] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -55,9 +58,15 @@ function Caixa() {
   }, []);
 
   const handlePaymentSelect = useCallback((paymentType) => {
-    setSelectedPayment((prevPayment) =>
-      prevPayment === paymentType ? null : paymentType
-    );
+    setSelectedPayment((prevPayment) => {
+      const newPayment = prevPayment === paymentType ? null : paymentType;
+      if (newPayment === "dinheiro") {
+        setDinheiroModalVisible(true);
+      } else {
+        setDinheiroModalVisible(false);
+      }
+      return newPayment;
+    });
   }, []);
 
   const handleSearch = useCallback(
@@ -78,7 +87,6 @@ function Caixa() {
     [products]
   );
 
-  // Implementação de debounce para evitar buscas a cada digitação
   const debouncedHandleSearch = useMemo(
     () => debounce(handleSearch, 300),
     [handleSearch]
@@ -92,7 +100,6 @@ function Caixa() {
 
   const handleAddProduct = useCallback(() => {
     if (selectedProduct) {
-      // Se o produto já estiver na lista, incrementa sua quantidade
       const index = purchaseList.findIndex(
         (item) => item.product._id === selectedProduct._id
       );
@@ -112,7 +119,6 @@ function Caixa() {
     }
   }, [selectedProduct, purchaseList, handleQuantityChange]);
 
-  // Cálculo do total memorizado para evitar recomputações desnecessárias
   const totalValue = useMemo(() => {
     return purchaseList.reduce(
       (acc, item) => acc + item.product.price * item.quantity,
@@ -120,10 +126,18 @@ function Caixa() {
     );
   }, [purchaseList]);
 
-  // Último produto adicionado (para exibir os detalhes)
   const lastProduct = useMemo(() => {
     return purchaseList.length > 0 ? purchaseList[purchaseList.length - 1].product : null;
   }, [purchaseList]);
+
+  // Calcula o troco enquanto o usuário digita
+  const computedTroco = useMemo(() => {
+    const received = parseFloat(dinheiroReceived);
+    if (!isNaN(received) && received >= totalValue) {
+      return received - totalValue;
+    }
+    return null;
+  }, [dinheiroReceived, totalValue]);
 
   const handleConcluirCompra = useCallback(async () => {
     if (purchaseList.length === 0) {
@@ -134,15 +148,28 @@ function Caixa() {
       message.error("Selecione uma forma de pagamento!");
       return;
     }
+    if (selectedPayment === "fiado" && !fiadoName.trim()) {
+      message.error("Informe o nome do cliente para pagamento fiado");
+      return;
+    }
+    if (selectedPayment === "dinheiro" && dinheiroReceived === "") {
+      message.error("Calcule o troco para pagamento em dinheiro");
+      return;
+    }
     setIsSubmitting(true);
 
-    // Mapeia a lista para o formato esperado pelo back-end: { productId, quantity }
     const items = purchaseList.map((item) => ({
       productId: item.product._id,
       quantity: item.quantity,
     }));
 
     const payment = { method: selectedPayment };
+    if (selectedPayment === "fiado") {
+      payment.details = fiadoName;
+    } else if (selectedPayment === "dinheiro") {
+      payment.details = `Valor recebido: R$ ${parseFloat(dinheiroReceived).toFixed(2)}`;
+    }
+
     const data = { items, payment };
 
     try {
@@ -163,13 +190,16 @@ function Caixa() {
       setSaleConfirmed(true);
       setPurchaseList([]);
       setSelectedPayment(null);
+      setFiadoName("");
+      setDinheiroTroco(null);
+      setDinheiroReceived("");
     } catch (error) {
       console.error("Erro:", error);
       message.error("Erro ao concluir a compra!");
     } finally {
       setIsSubmitting(false);
     }
-  }, [purchaseList, selectedPayment]);
+  }, [purchaseList, selectedPayment, fiadoName, dinheiroReceived]);
 
   return (
     <div className="page-container">
@@ -343,6 +373,15 @@ function Caixa() {
             </Button>
           </div>
 
+          {selectedPayment === "fiado" && (
+            <Input
+              placeholder="Nome do cliente"
+              value={fiadoName}
+              onChange={(e) => setFiadoName(e.target.value)}
+              style={{ marginTop: "10px" }}
+            />
+          )}
+
           <Button
             type="primary"
             className="concluir-compra"
@@ -356,7 +395,6 @@ function Caixa() {
         </div>
       </div>
 
-      {/* Modal para exibir confirmação de venda */}
       <Modal
         visible={saleConfirmed}
         footer={null}
@@ -376,6 +414,53 @@ function Caixa() {
             </Button>,
           ]}
         />
+      </Modal>
+
+      <Modal
+        visible={dinheiroModalVisible}
+        title="Calcular Troco"
+        onCancel={() => {
+          setDinheiroModalVisible(false);
+          setSelectedPayment(null);
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setDinheiroModalVisible(false);
+              setSelectedPayment(null);
+            }}
+          >
+            Cancelar
+          </Button>,
+          <Button
+            key="confirm"
+            type="primary"
+            onClick={() => {
+              const received = parseFloat(dinheiroReceived);
+              if (isNaN(received) || received < totalValue) {
+                message.error("Valor recebido deve ser maior ou igual ao total");
+                return;
+              }
+              setDinheiroTroco(received - totalValue);
+              setDinheiroModalVisible(false);
+              message.success(`Troco calculado: R$ ${(received - totalValue).toFixed(2)}`);
+            }}
+          >
+            Confirmar
+          </Button>,
+        ]}
+      >
+        <Input
+          type="number"
+          placeholder="Valor recebido"
+          value={dinheiroReceived}
+          onChange={(e) => setDinheiroReceived(e.target.value)}
+        />
+        <p>Total: R$ {totalValue.toFixed(2)}</p>
+        {computedTroco !== null && (
+          <p>Troco: R$ {computedTroco.toFixed(2)}</p>
+        )}
       </Modal>
     </div>
   );
