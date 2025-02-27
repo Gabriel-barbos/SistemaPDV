@@ -49,4 +49,15 @@ router.post('/', async (req, res) => {
   }
 });
 
+// rota para exibir todas as vendas
+router.get('/', async (req, res) => {
+  try {
+    // Busca todas as vendas e popula os dados do produto em cada item
+    const sales = await Sale.find().populate('items.product');
+    res.status(200).json(sales);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

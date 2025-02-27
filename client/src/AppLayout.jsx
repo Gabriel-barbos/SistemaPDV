@@ -15,7 +15,7 @@ const items = [
   { key: "1", label: "Caixa", icon: <ShoppingCartOutlined />, path: "/caixa" },
   { key: "2", label: "Produtos", icon: <TagOutlined />, path: "/admin/produtos" },
   { key: "3", label: "Estoque", icon: <AppstoreOutlined />, path: "/admin/estoque" },
-  { key: "4", label: "Relatórios", icon: <PieChartOutlined />, path: "/admin/envios" },
+  { key: "4", label: "Relatórios", icon: <PieChartOutlined />, path: "/admin/relatorios" },
 ];
 
 const AppLayout = ({ children, selectedKey }) => {
