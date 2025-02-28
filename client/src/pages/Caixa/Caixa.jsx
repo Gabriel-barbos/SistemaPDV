@@ -12,8 +12,8 @@ import {
 } from "@ant-design/icons";
 import { Input, Button, List, message, Modal, Result } from "antd";
 import product from "../../assets/product.avif";
-import emptyGIF from "../../assets/emptyGIF.gif";
-import emptyList from "../../assets/emptyList.png";
+import emptyGIF from "../../assets/EmptyGIF.gif";
+import emptyList from "../../assets/EmptyList.png";
 import "../Caixa/caixa.css";
 const { Search } = Input;
 import ProductItem from "../../components/ProductItem";
