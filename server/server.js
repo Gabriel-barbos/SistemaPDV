@@ -4,7 +4,7 @@ const cors = require('cors');
 require('dotenv').config(); 
 
 // Importação das rotas
-const productRoutes = require('./routes/productRoutes');
+const productRoutes = require('./routes/ProductRoutes');
 const saleRoutes = require('./routes/SalesRoutes');
 
 const app = express();
