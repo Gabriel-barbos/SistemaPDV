@@ -14,7 +14,7 @@ const GeneralTable = () => {
   const fetchSales = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:3000/sales');
+      const { data } = await axios.get('https://sistemapdv-2.onrender.com/sales');
       setSales(data);
     } catch (error) {
       console.error('Erro ao buscar vendas:', error);

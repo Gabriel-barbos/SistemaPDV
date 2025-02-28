@@ -14,7 +14,7 @@ const MonthlySalesTable = () => {
   const fetchSales = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:3000/sales');
+      const { data } = await axios.get('https://sistemapdv-2.onrender.com/sales');
       // Filtra as vendas para exibir somente as realizadas no mês atual
       const monthlySales = data.filter((sale) => moment(sale.date).isSame(moment(), 'month'));
       setSales(monthlySales);

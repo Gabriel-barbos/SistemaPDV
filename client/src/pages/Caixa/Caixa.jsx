@@ -173,7 +173,7 @@ function Caixa() {
     const data = { items, payment };
 
     try {
-      const response = await fetch("http://localhost:3000/sales", {
+      const response = await fetch("https://sistemapdv-2.onrender.com/sales", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

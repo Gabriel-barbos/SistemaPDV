@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { message } from 'antd';
 
-const API_URL = 'http://localhost:3000/products';
+const API_URL = 'https://sistemapdv-2.onrender.com/products';
 
 const useProducts = () => {
   const [products, setProducts] = useState([]);

@@ -42,7 +42,7 @@ function Relatorios() {
 
   // Busca os produtos para calcular o estoque
   useEffect(() => {
-    fetch('http://localhost:3000/products')
+    fetch('https://sistemapdv-2.onrender.com/products')
       .then(response => response.json())
       .then(data => {
         // Soma do custo dos produtos vezes a quantidade
@@ -67,7 +67,7 @@ function Relatorios() {
 
   // Busca as vendas e filtra por dia, mês e ano
   useEffect(() => {
-    fetch('http://localhost:3000/sales')
+    fetch('https://sistemapdv-2.onrender.com/sales')
       .then(response => response.json())
       .then(data => {
         const hoje = new Date();
