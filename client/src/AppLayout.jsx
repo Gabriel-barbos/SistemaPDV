@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logo from "../src/assets/logo.jpeg"
 import './main.css';
 import {
   PieChartOutlined,
@@ -7,11 +8,11 @@ import {
   AppstoreOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Button } from 'antd';
 
 const { Content, Footer, Sider } = Layout;
 
-const items = [
+const allItems = [
   { key: "1", label: "Caixa", icon: <ShoppingCartOutlined />, path: "/caixa" },
   { key: "2", label: "Produtos", icon: <TagOutlined />, path: "/admin/produtos" },
   { key: "3", label: "Estoque", icon: <AppstoreOutlined />, path: "/admin/estoque" },
@@ -20,13 +21,29 @@ const items = [
 
 const AppLayout = ({ children, selectedKey }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
 
+  // Recupera o usuário logado do localStorage
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  // Define as abas permitidas de acordo com o papel do usuário
+  const allowedItems =
+    user && user.role === 'admin'
+      ? allItems
+      : allItems.filter(item => item.key === "1");
+
+  // Navega para a rota selecionada
   const handleMenuClick = (e) => {
-    const selectedItem = items.find(item => item.key === e.key);
+    const selectedItem = allowedItems.find(item => item.key === e.key);
     if (selectedItem) {
-      navigate(selectedItem.path); // Faz a navegação para a rota correspondente
+      navigate(selectedItem.path);
     }
+  };
+
+  // Realiza o logout removendo o usuário e redirecionando para a tela de login
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/');
   };
 
   return (
@@ -37,14 +54,30 @@ const AppLayout = ({ children, selectedKey }) => {
         onCollapse={(value) => setCollapsed(value)}
         style={{ background: '#002140' }}
       >
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[selectedKey]} // Mantém a aba selecionada
-          onClick={handleMenuClick} // Captura os cliques no menu
-          items={items}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div>
+            {/* Espaço para a logo */}
+            <div style={{ padding: '16px', textAlign: 'center' }}>
+              <img 
+                src={logo} 
+                alt="Logo" 
+                style={{ maxWidth: '100%', height: 'auto' }} 
+              />
+            </div>
+            <Menu
+              theme="dark"
+              mode="inline"
+              selectedKeys={[selectedKey]}
+              onClick={handleMenuClick}
+              items={allowedItems}
+            />
+          </div>
+          <div style={{ marginTop: 'auto', padding: '10px', textAlign: 'center' }}>
+            <Button type="primary" danger onClick={handleLogout} block>
+              Logout
+            </Button>
+          </div>
+        </div>
       </Sider>
       <Layout>
         <Content style={{ margin: '0 16px' }}>
@@ -53,7 +86,7 @@ const AppLayout = ({ children, selectedKey }) => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center', background: '#001529', color: '#fff' }}>
-           ©{new Date().getFullYear()} Created by Gabriel Barbosa
+          ©{new Date().getFullYear()} Created by Gabriel Barbosa
         </Footer>
       </Layout>
     </Layout>

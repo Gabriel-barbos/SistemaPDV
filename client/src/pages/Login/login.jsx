@@ -1,53 +1,64 @@
-import loginGIF from "../../assets/loginGIF.gif"
-import "./login.css"
-import {  UserOutlined } from '@ant-design/icons';
-import { Input,  } from 'antd';
+import loginGIF from "../../assets/loginGIF.gif";
+import "./login.css";
+import { UserOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
-
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-        const { data } = await axios.post('http://localhost:3000/login', { username, password });
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('role', data.role);
-  
-        // Redirecionar com base no nível de acesso
-        if (data.role === 'admin') window.location.href = '/admin';
-        else window.location.href = '/operator';
-    } catch (err) {
-        setError('Credenciais inválidas');
+
+    // Exemplo de credenciais locais
+    if (username === 'admin' && password === 'Ismael1234@') {
+      localStorage.setItem('user', JSON.stringify({ role: 'admin', username }));
+      navigate('/admin/relatorios'); // redireciona para a rota do administrador
+    } else if (username === 'deisevariedades' && password === 'Ismael1234@') {
+      localStorage.setItem('user', JSON.stringify({ role: 'operador', username }));
+      navigate('/caixa'); // redireciona para a rota do operador
+    } else {
+      setError('Credenciais inválidas');
     }
   };
+
   return (
     <div>
       <div className="login-container">
         <div className="login-left">
-            <h1>Faça login <br /> E acesse seu sistema</h1>
-        <img src={loginGIF} alt="" />
+          <h1>Faça login <br /> e acesse seu sistema</h1>
+          <img src={loginGIF} alt="Login" />
         </div>
 
-            <div className="login-right">
-                   <div className="login-form">
-                        <h1>Login</h1>
-                              <form onSubmit={handleSubmit}>
-                                 <Input prefix={<UserOutlined />} className="input" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}/>
-                                 <Input.Password placeholder="input password " value={password} onChange={(e) => setPassword(e.target.value)}/>
-      
-                                <button  type="submit">Entrar</button>
-                                            {error && <p>{error}</p>}
+        <div className="login-right">
+          <div className="login-form">
+            <h1>Login</h1>
+            <form onSubmit={handleSubmit}>
+              <Input
+                prefix={<UserOutlined />}
+                className="input"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Input.Password
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-                                </form>
-                    </div>
-            </div>
+              <button type="submit">Entrar</button>
+              {error && <p>{error}</p>}
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    </div>
-  )
+  );
 }
 
-export default Login
+export default Login;
