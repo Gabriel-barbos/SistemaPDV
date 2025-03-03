@@ -28,6 +28,8 @@ function Caixa() {
   const [purchaseList, setPurchaseList] = useState([]);
   const [saleConfirmed, setSaleConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Estado para armazenar os dados do comprovante
+  const [receiptData, setReceiptData] = useState(null);
 
   // Estados para dados adicionais de pagamento
   const [fiadoName, setFiadoName] = useState("");
@@ -187,7 +189,25 @@ function Caixa() {
       }
 
       await response.json();
+
+      // Prepara os dados do comprovante para impressão
+      const saleDataForReceipt = {
+        items: purchaseList,
+        total: totalValue,
+        payment:
+          selectedPayment === "fiado"
+            ? `Fiado - ${fiadoName}`
+            : selectedPayment === "dinheiro"
+            ? `Dinheiro - Valor recebido: R$ ${parseFloat(dinheiroReceived).toFixed(2)} | Troco: R$ ${
+                dinheiroTroco !== null ? dinheiroTroco.toFixed(2) : "0.00"
+              }`
+            : "Cartão",
+      };
+
+      setReceiptData(saleDataForReceipt);
       setSaleConfirmed(true);
+
+      // Limpa os dados da compra
       setPurchaseList([]);
       setSelectedPayment(null);
       setFiadoName("");
@@ -199,7 +219,32 @@ function Caixa() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [purchaseList, selectedPayment, fiadoName, dinheiroReceived]);
+  }, [purchaseList, selectedPayment, fiadoName, dinheiroReceived, totalValue, dinheiroTroco]);
+
+  const handlePrint = () => {
+    const printContents = document.getElementById("receipt-content").innerHTML;
+    const printWindow = window.open("", "", "width=800,height=600");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Comprovante de Venda</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { text-align: center; }
+            ul { list-style-type: none; padding: 0; }
+            li { margin-bottom: 5px; }
+          </style>
+        </head>
+        <body>
+          ${printContents}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
 
   return (
     <div className="page-container">
@@ -223,10 +268,7 @@ function Caixa() {
               className="autocomplete-list"
               dataSource={filteredProducts}
               renderItem={(item) => (
-                <List.Item
-                  className="autocomplete-item"
-                  onClick={() => handleSelectProduct(item)}
-                >
+                <List.Item className="autocomplete-item" onClick={() => handleSelectProduct(item)}>
                   {item.name} - R$ {item.price}
                 </List.Item>
               )}
@@ -241,22 +283,13 @@ function Caixa() {
           </div>
           <div className="list">
             {purchaseList.length === 0 ? (
-              <div
-                className="empty-purchase-list"
-                style={{ textAlign: "center", padding: "20px" }}
-              >
+              <div className="empty-purchase-list" style={{ textAlign: "center", padding: "20px" }}>
                 <img
                   src={emptyList}
                   alt="Nenhum item"
-                  style={{
-                    width: "100%",
-                    maxWidth: "200px",
-                    marginBottom: "10px",
-                  }}
+                  style={{ width: "100%", maxWidth: "200px", marginBottom: "10px" }}
                 />
-                <p style={{ fontSize: 20, fontWeight: 600 }}>
-                  Nenhum item na lista de compras
-                </p>
+                <p style={{ fontSize: 20, fontWeight: 600 }}>Nenhum item na lista de compras</p>
               </div>
             ) : (
               purchaseList.map((item, index) => (
@@ -264,9 +297,7 @@ function Caixa() {
                   key={index}
                   product={item.product}
                   quantity={item.quantity}
-                  onQuantityChange={(newQuantity) =>
-                    handleQuantityChange(index, newQuantity)
-                  }
+                  onQuantityChange={(newQuantity) => handleQuantityChange(index, newQuantity)}
                   onRemove={() => handleRemoveProduct(index)}
                 />
               ))
@@ -285,11 +316,7 @@ function Caixa() {
             <>
               <img
                 className="product-img"
-                src={
-                  lastProduct.image && lastProduct.image.length > 0
-                    ? lastProduct.image[0]
-                    : product
-                }
+                src={lastProduct.image && lastProduct.image.length > 0 ? lastProduct.image[0] : product}
                 alt="Produto"
               />
               <div className="product-details">
@@ -308,8 +335,7 @@ function Caixa() {
                 <div className="detail-item">
                   <BarcodeOutlined style={{ fontSize: 20, marginRight: 10 }} />
                   <span className="detail-text">
-                    <strong>Cod.produto:</strong>{" "}
-                    {lastProduct.code || lastProduct.BarCode}
+                    <strong>Cod.produto:</strong> {lastProduct.code || lastProduct.BarCode}
                   </span>
                 </div>
               </div>
@@ -405,11 +431,10 @@ function Caixa() {
           title="Venda confirmada!"
           subTitle="A sua compra foi registrada com sucesso."
           extra={[
-            <Button
-              type="primary"
-              key="ok"
-              onClick={() => setSaleConfirmed(false)}
-            >
+            <Button type="primary" key="print" onClick={handlePrint}>
+              Imprimir Comprovante
+            </Button>,
+            <Button type="default" key="ok" onClick={() => setSaleConfirmed(false)}>
               OK
             </Button>,
           ]}
@@ -458,10 +483,38 @@ function Caixa() {
           onChange={(e) => setDinheiroReceived(e.target.value)}
         />
         <p>Total: R$ {totalValue.toFixed(2)}</p>
-        {computedTroco !== null && (
-          <p>Troco: R$ {computedTroco.toFixed(2)}</p>
-        )}
+        {computedTroco !== null && <p>Troco: R$ {computedTroco.toFixed(2)}</p>}
       </Modal>
+
+      {/* Div oculta com o conteúdo do comprovante para impressão */}
+      <div id="receipt-content" style={{ display: "none" }}>
+        <h1>Comprovante de Venda</h1>
+        {receiptData && (
+          <>
+            <p>
+              <strong>Total:</strong>{" "}
+              {receiptData.total.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </p>
+            <ul>
+              {receiptData.items.map((item, index) => (
+                <li key={index}>
+                  {item.product.name} - Quantidade: {item.quantity} - Valor:{" "}
+                  {Number(item.product.price).toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </li>
+              ))}
+            </ul>
+            <p>
+              <strong>Forma de Pagamento:</strong> {receiptData.payment}
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }
