@@ -56,7 +56,7 @@ const ProductForm = () => {
               fileList={fileList}
               onChange={({ fileList }) => setFileList(fileList)}
             >
-              <Button icon={<UploadOutlined />}>Selecionar Imagem</Button>
+              <Button icon={<UploadOutlined />}>Selecionar Imagem  PNG ou JPEG</Button>
             </Upload>
           </Form.Item>
         </Col>
