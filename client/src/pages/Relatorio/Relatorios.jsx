@@ -119,7 +119,7 @@ function Relatorios() {
     <>
       <div className="Page-title">
         <PieChartOutlined style={{ fontSize: 25, marginRight: 5 }} />
-        <h1>Relátorios</h1>
+        <h1>Relatórios</h1>
       </div>
       <div className='stat-list'>
         <div className='stats-card'>
@@ -168,7 +168,7 @@ function Relatorios() {
 
       <div className="Page-title">
       <ContainerOutlined style={{ fontSize: 25, marginRight: 5 }} />
-        <h1>Historico</h1>
+        <h1>Histórico</h1>
       </div>
 
       <Tabs 

@@ -19,7 +19,9 @@ const { Search } = Input;
 import ProductItem from "../../components/ProductItem";
 import useProducts from "../Produtos/useProducts";
 
+
 function Caixa() {
+
   const { products, fetchProducts } = useProducts();
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,7 +30,6 @@ function Caixa() {
   const [purchaseList, setPurchaseList] = useState([]);
   const [saleConfirmed, setSaleConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Estado para armazenar os dados do comprovante
   const [receiptData, setReceiptData] = useState(null);
 
   // Estados para dados adicionais de pagamento

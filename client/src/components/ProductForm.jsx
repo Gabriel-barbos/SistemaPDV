@@ -88,7 +88,7 @@ const ProductForm = () => {
             name="price"
             rules={[{ required: true, message: 'Por favor, insira o preço do produto!' }]}
           >
-            <InputNumber style={{ width: '100%' }} placeholder="Preço" />
+            <InputNumber style={{ width: '100%' }} placeholder="Ex: 6.50" />
           </Form.Item>
         </Col>
 
