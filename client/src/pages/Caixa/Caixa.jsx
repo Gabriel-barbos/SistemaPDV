@@ -13,7 +13,7 @@ import {
 import { Input, Button, List, message, Modal, Result } from "antd";
 import product from "../../assets/product.avif";
 import emptyGIF from "../../assets/EmptyGIF.gif";
-import emptyList from "../../assets/EmptyList.png";
+import emptyCart from "../../assets/EmptyCart.gif";
 import "../Caixa/caixa.css";
 const { Search } = Input;
 import ProductItem from "../../components/ProductItem";
@@ -286,9 +286,9 @@ function Caixa() {
             {purchaseList.length === 0 ? (
               <div className="empty-purchase-list" style={{ textAlign: "center", padding: "20px" }}>
                 <img
-                  src={emptyList}
+                  src={emptyCart}
                   alt="Nenhum item"
-                  style={{ width: "100%", maxWidth: "200px", marginBottom: "10px" }}
+                  style={{ width: "100%", maxWidth: "250px", marginBottom: "5px" }}
                 />
                 <p style={{ fontSize: 20, fontWeight: 600 }}>Nenhum item na lista de compras</p>
               </div>

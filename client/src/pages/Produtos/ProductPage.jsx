@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import "./productpage.css";
 import { Button, Drawer, Spin, Alert } from 'antd';
-import { ShoppingOutlined,PlusCircleOutlined } from '@ant-design/icons';
+import { ShoppingOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import ProductForm from '../../components/ProductForm';
 import ProductCard from '../../components/ProductCard';
 import useProducts from '../Produtos/useProducts';
+import EmptyProduct from '../../assets/EmptyProduct.png'
 
 function ProductPage() {
   const [open, setOpen] = useState(false);
@@ -60,8 +61,23 @@ function ProductPage() {
             <ProductCard key={product._id} product={product} />
           ))
         ) : (
-          !loading && <p>Nenhum produto encontrado.</p>
-        )}
+          !loading &&
+
+          <div className="empty-purchase-list"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "10px"
+            }}>
+            <img
+              src={EmptyProduct}
+              alt="Nenhum item"
+              style={{ height: "100%", maxHeight: "100px", marginBottom: "5px" }}
+            />
+            <p style={{ fontSize: 20, fontWeight: 600 }}>Nenhum Produto adicionado</p>
+          </div>)}
       </div>
     </>
   );
