@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Drawer, Form, Input, InputNumber, message, Upload, Popconfirm } from 'antd';
-import { EyeOutlined, DeleteOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, SaveOutlined, FileSearchOutlined } from '@ant-design/icons';
 import "../assets/productCard.css";
 import useProducts from '../pages/Produtos/useProducts';
 
 function ProductCard({ product }) {
-  const { updateProduct, deleteProduct } = useProducts(); // Hook para atualizar e deletar produtos
+  const { updateProduct, deleteProduct } = useProducts(); 
   const [open, setOpen] = useState(false);
-  const [form] = Form.useForm(); // Formulário do Ant Design
+  const [form] = Form.useForm(); 
 
   // Abrir Drawer e preencher os campos
   const showDrawer = () => {
@@ -62,14 +62,13 @@ function ProductCard({ product }) {
       </div>
 
       {/* Botão para abrir o Drawer */}
-      <Button
-        type="primary"
-        icon={<EyeOutlined />}
-        style={{ backgroundColor: '#', borderColor: '#f7f7f7', color: 'white' }}
-        onClick={showDrawer}
-      >
-        Ver detalhes
-      </Button>
+      <button
+    className="custom-button"
+    onClick={showDrawer}
+  >
+    <FileSearchOutlined style={{ marginRight: '8px' }} />
+    Ver detalhes
+  </button>
 
       {/* Drawer de Edição */}
       <Drawer title="Editar Produto" onClose={onClose} open={open} width={400}>
