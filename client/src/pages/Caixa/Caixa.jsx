@@ -1,37 +1,24 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import debounce from "lodash/debounce";
-import {
-  BarcodeOutlined,
-  TagOutlined,
-  ShoppingCartOutlined,
-  CheckCircleOutlined,
-  ShoppingOutlined,
-  CreditCardOutlined,
-  DollarOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
-import { Input, Button, List, message, Modal, Result } from "antd";
-import product from "../../assets/product.avif";
-import emptyGIF from "../../assets/EmptyGIF.gif";
-import emptyCart from "../../assets/EmptyCart.gif";
+import React, { useState, useEffect, useCallback } from "react";
+import { BarcodeOutlined } from "@ant-design/icons";
+import { message, Modal, Result, Button } from "antd";
 import "../Caixa/caixa.css";
-const { Search } = Input;
-import ProductItem from "../../components/ProductItem";
 import useProducts from "../Produtos/useProducts";
-
+import ProductSearch from "./components/ProductSearch";
+import PurchaseList from "./components/PurchaseList";
+import OrderDetails from "./components/OrderDetails";
+import OrderSummary from "./components/OrderSummary";
+import ReceiptContent from "./components/ReceiptContent";
 
 function Caixa() {
-
   const { products, fetchProducts } = useProducts();
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  // Estados principais
   const [purchaseList, setPurchaseList] = useState([]);
+  const [selectedPayment, setSelectedPayment] = useState(null);
   const [saleConfirmed, setSaleConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
-
+  
   // Estados para dados adicionais de pagamento
   const [fiadoName, setFiadoName] = useState("");
   const [dinheiroModalVisible, setDinheiroModalVisible] = useState(false);
@@ -41,6 +28,22 @@ function Caixa() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  const handleAddProduct = useCallback((product) => {
+    const index = purchaseList.findIndex(
+      (item) => item.product._id === product._id
+    );
+    
+    if (index !== -1) {
+      handleQuantityChange(index, purchaseList[index].quantity + 1);
+    } else {
+      setPurchaseList((prev) => [
+        ...prev,
+        { product, quantity: 1 },
+      ]);
+    }
+    message.success("Produto adicionado à lista de compra!");
+  }, [purchaseList]);
 
   const handleRemoveProduct = useCallback((indexToRemove) => {
     setPurchaseList((prevList) =>
@@ -61,86 +64,22 @@ function Caixa() {
   }, []);
 
   const handlePaymentSelect = useCallback((paymentType) => {
-    setSelectedPayment((prevPayment) => {
-      const newPayment = prevPayment === paymentType ? null : paymentType;
-      if (newPayment === "dinheiro") {
-        setDinheiroModalVisible(true);
-      } else {
-        setDinheiroModalVisible(false);
-      }
-      return newPayment;
-    });
-  }, []);
-
-  const handleSearch = useCallback(
-    (value) => {
-      setSearchTerm(value);
-      setSelectedProduct(null);
-      if (!value.trim()) {
-        setFilteredProducts([]);
-        return;
-      }
-      const filtered = products.filter(
-        (product) =>
-          product.name?.toLowerCase().includes(value.toLowerCase()) ||
-          product.BarCode?.includes(value)
-      );
-      setFilteredProducts(filtered);
-    },
-    [products]
-  );
-
-  const debouncedHandleSearch = useMemo(
-    () => debounce(handleSearch, 300),
-    [handleSearch]
-  );
-
-  const handleSelectProduct = useCallback((product) => {
-    setSearchTerm(product.name);
-    setSelectedProduct(product);
-    setFilteredProducts([]);
-  }, []);
-
-  const handleAddProduct = useCallback(() => {
-    if (selectedProduct) {
-      const index = purchaseList.findIndex(
-        (item) => item.product._id === selectedProduct._id
-      );
-      if (index !== -1) {
-        handleQuantityChange(index, purchaseList[index].quantity + 1);
-      } else {
-        setPurchaseList((prev) => [
-          ...prev,
-          { product: selectedProduct, quantity: 1 },
-        ]);
-      }
-      setSearchTerm("");
-      setSelectedProduct(null);
-      message.success("Produto adicionado à lista de compra!");
+    if (paymentType === "dinheiro") {
+      setSelectedPayment("dinheiro");
+      setDinheiroModalVisible(true);
     } else {
-      message.error("Selecione um produto da lista de sugestões.");
+      setSelectedPayment(selectedPayment === paymentType ? null : paymentType);
+      setDinheiroModalVisible(false);
     }
-  }, [selectedProduct, purchaseList, handleQuantityChange]);
+  }, [selectedPayment]);
 
-  const totalValue = useMemo(() => {
-    return purchaseList.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
-      0
-    );
-  }, [purchaseList]);
+  const totalValue = purchaseList.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  );
 
-  const lastProduct = useMemo(() => {
-    return purchaseList.length > 0 ? purchaseList[purchaseList.length - 1].product : null;
-  }, [purchaseList]);
-
-  // Calcula o troco enquanto o usuário digita
-  const computedTroco = useMemo(() => {
-    const received = parseFloat(dinheiroReceived);
-    if (!isNaN(received) && received >= totalValue) {
-      return received - totalValue;
-    }
-    return null;
-  }, [dinheiroReceived, totalValue]);
+  const lastProduct = purchaseList.length > 0 ? 
+    purchaseList[purchaseList.length - 1].product : null;
 
   const handleConcluirCompra = useCallback(async () => {
     if (purchaseList.length === 0) {
@@ -155,10 +94,11 @@ function Caixa() {
       message.error("Informe o nome do cliente para pagamento fiado");
       return;
     }
-    if (selectedPayment === "dinheiro" && dinheiroReceived === "") {
+    if (selectedPayment === "dinheiro" && dinheiroTroco === null) {
       message.error("Calcule o troco para pagamento em dinheiro");
       return;
     }
+    
     setIsSubmitting(true);
 
     const items = purchaseList.map((item) => ({
@@ -191,7 +131,6 @@ function Caixa() {
 
       await response.json();
 
-      // Prepara os dados do comprovante para impressão
       const saleDataForReceipt = {
         items: purchaseList,
         total: totalValue,
@@ -250,176 +189,42 @@ function Caixa() {
   return (
     <div className="page-container">
       <div className="left-page">
-        <div className="searchbar">
-          <div className="page-title">
-            <BarcodeOutlined style={{ fontSize: 25, marginRight: 5 }} />
-            <h2> Adicionar produto</h2>
-          </div>
-          <Search
-            placeholder="Digite o código ou nome do produto"
-            allowClear
-            enterButton="Adicionar"
-            size="large"
-            value={searchTerm}
-            onChange={(e) => debouncedHandleSearch(e.target.value)}
-            onSearch={handleAddProduct}
-          />
-          {filteredProducts.length > 0 && (
-            <List
-              className="autocomplete-list"
-              dataSource={filteredProducts}
-              renderItem={(item) => (
-                <List.Item className="autocomplete-item" onClick={() => handleSelectProduct(item)}>
-                  {item.name} - R$ {item.price}
-                </List.Item>
-              )}
-            />
-          )}
-        </div>
-
-        <div className="order-list">
-          <div className="page-title">
-            <TagOutlined style={{ fontSize: 25, marginRight: 5 }} />
-            <h2> Lista de compra</h2>
-          </div>
-          <div className="list">
-            {purchaseList.length === 0 ? (
-              <div className="empty-purchase-list" style={{ textAlign: "center", padding: "20px" }}>
-                <img
-                  src={emptyCart}
-                  alt="Nenhum item"
-                  style={{ width: "100%", maxWidth: "250px", marginBottom: "5px" }}
-                />
-                <p style={{ fontSize: 20, fontWeight: 600 }}>Nenhum item na lista de compras</p>
-              </div>
-            ) : (
-              purchaseList.map((item, index) => (
-                <ProductItem
-                  key={index}
-                  product={item.product}
-                  quantity={item.quantity}
-                  onQuantityChange={(newQuantity) => handleQuantityChange(index, newQuantity)}
-                  onRemove={() => handleRemoveProduct(index)}
-                />
-              ))
-            )}
-          </div>
-        </div>
+        <ProductSearch 
+          products={products}
+          onAddProduct={handleAddProduct}
+        />
+        
+        <PurchaseList
+          purchaseList={purchaseList}
+          onQuantityChange={handleQuantityChange}
+          onRemoveProduct={handleRemoveProduct}
+        />
       </div>
 
       <div className="right-page">
-        <div className="product-container">
-          <div className="page-title">
-            <ShoppingOutlined style={{ fontSize: 25, marginRight: 5 }} />
-            <h2>Detalhes do pedido</h2>
-          </div>
-          {lastProduct ? (
-            <>
-              <img
-                className="product-img"
-                src={lastProduct.image && lastProduct.image.length > 0 ? lastProduct.image[0] : product}
-                alt="Produto"
-              />
-              <div className="product-details">
-                <div className="detail-item">
-                  <TagOutlined style={{ fontSize: 20, marginRight: 10 }} />
-                  <span className="detail-text">
-                    <strong>Nome do Produto:</strong> {lastProduct.name}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <DollarOutlined style={{ fontSize: 20, marginRight: 10 }} />
-                  <span className="detail-text">
-                    <strong>Preço:</strong> R$ {lastProduct.price}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <BarcodeOutlined style={{ fontSize: 20, marginRight: 10 }} />
-                  <span className="detail-text">
-                    <strong>Cod.produto:</strong> {lastProduct.code || lastProduct.BarCode}
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <img className="product-img" src={emptyGIF} alt="Produto" />
-              <div className="product-details">
-                <div className="detail-item">
-                  <span className="empty-text">Nenhum produto adicionado</span>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="total-container">
-          <div className="page-title">
-            <ShoppingCartOutlined style={{ fontSize: 25, marginRight: 5 }} />
-            <h2>Resumo da compra</h2>
-          </div>
-          <div className="details">
-            <span>Total: </span>
-            <span className="total-value">
-              {totalValue.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </span>
-          </div>
-
-          <div className="page-title">
-            <ShoppingCartOutlined style={{ fontSize: 25, marginRight: 5 }} />
-            <h2>Forma de pagamento:</h2>
-          </div>
-
-          <div className="payment-buttons">
-            <Button
-              icon={<CreditCardOutlined />}
-              onClick={() => handlePaymentSelect("cartao")}
-              disabled={selectedPayment && selectedPayment !== "cartao"}
-              className={selectedPayment === "cartao" ? "selected" : ""}
-            >
-              Cartão
-            </Button>
-            <Button
-              icon={<DollarOutlined />}
-              onClick={() => handlePaymentSelect("dinheiro")}
-              disabled={selectedPayment && selectedPayment !== "dinheiro"}
-              className={selectedPayment === "dinheiro" ? "selected" : ""}
-            >
-              Dinheiro
-            </Button>
-            <Button
-              icon={<FileTextOutlined />}
-              onClick={() => handlePaymentSelect("fiado")}
-              disabled={selectedPayment && selectedPayment !== "fiado"}
-              className={selectedPayment === "fiado" ? "selected" : ""}
-            >
-              Fiado
-            </Button>
-          </div>
-
-          {selectedPayment === "fiado" && (
-            <Input
-              placeholder="Nome do cliente"
-              value={fiadoName}
-              onChange={(e) => setFiadoName(e.target.value)}
-              style={{ marginTop: "10px" }}
-            />
-          )}
-
-          <Button
-            type="primary"
-            className="concluir-compra"
-            onClick={handleConcluirCompra}
-            loading={isSubmitting}
-            disabled={isSubmitting}
-          >
-            <CheckCircleOutlined />
-            Concluir Compra
-          </Button>
-        </div>
+        <OrderDetails lastProduct={lastProduct} />
+        
+        <OrderSummary
+          totalValue={totalValue}
+          selectedPayment={selectedPayment}
+          onPaymentSelect={handlePaymentSelect}
+          fiadoName={fiadoName}
+          onFiadoNameChange={setFiadoName}
+          onConcluirCompra={handleConcluirCompra}
+          isSubmitting={isSubmitting}
+          dinheiroModalVisible={dinheiroModalVisible}
+          dinheiroReceived={dinheiroReceived}
+          onDinheiroReceivedChange={setDinheiroReceived}
+          dinheiroTroco={dinheiroTroco}
+          onDinheiroTrocoChange={setDinheiroTroco}
+          onCloseDinheiroModal={() => {
+            setDinheiroModalVisible(false);
+            // Se cancelar, remove a seleção de dinheiro
+            if (selectedPayment === "dinheiro" && !dinheiroTroco) {
+              setSelectedPayment(null);
+            }
+          }}
+        />
       </div>
 
       <Modal
@@ -442,80 +247,7 @@ function Caixa() {
         />
       </Modal>
 
-      <Modal
-        visible={dinheiroModalVisible}
-        title="Calcular Troco"
-        onCancel={() => {
-          setDinheiroModalVisible(false);
-          setSelectedPayment(null);
-        }}
-        footer={[
-          <Button
-            key="cancel"
-            onClick={() => {
-              setDinheiroModalVisible(false);
-              setSelectedPayment(null);
-            }}
-          >
-            Cancelar
-          </Button>,
-          <Button
-            key="confirm"
-            type="primary"
-            onClick={() => {
-              const received = parseFloat(dinheiroReceived);
-              if (isNaN(received) || received < totalValue) {
-                message.error("Valor recebido deve ser maior ou igual ao total");
-                return;
-              }
-              setDinheiroTroco(received - totalValue);
-              setDinheiroModalVisible(false);
-              message.success(`Troco calculado: R$ ${(received - totalValue).toFixed(2)}`);
-            }}
-          >
-            Confirmar
-          </Button>,
-        ]}
-      >
-        <Input
-          type="number"
-          placeholder="Valor recebido"
-          value={dinheiroReceived}
-          onChange={(e) => setDinheiroReceived(e.target.value)}
-        />
-        <p>Total: R$ {totalValue.toFixed(2)}</p>
-        {computedTroco !== null && <p>Troco: R$ {computedTroco.toFixed(2)}</p>}
-      </Modal>
-
-      {/* Div oculta com o conteúdo do comprovante para impressão */}
-      <div id="receipt-content" style={{ display: "none" }}>
-        <h1>Comprovante de Venda</h1>
-        {receiptData && (
-          <>
-            <p>
-              <strong>Total:</strong>{" "}
-              {receiptData.total.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </p>
-            <ul>
-              {receiptData.items.map((item, index) => (
-                <li key={index}>
-                  {item.product.name} - Quantidade: {item.quantity} - Valor:{" "}
-                  {Number(item.product.price).toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </li>
-              ))}
-            </ul>
-            <p>
-              <strong>Forma de Pagamento:</strong> {receiptData.payment}
-            </p>
-          </>
-        )}
-      </div>
+      <ReceiptContent receiptData={receiptData} />
     </div>
   );
 }

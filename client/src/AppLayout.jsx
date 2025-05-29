@@ -32,7 +32,6 @@ const AppLayout = ({ children, selectedKey }) => {
       ? allItems
       : allItems.filter(item => item.key === "1");
 
-  // Navega para a rota selecionada
   const handleMenuClick = (e) => {
     const selectedItem = allowedItems.find(item => item.key === e.key);
     if (selectedItem) {
@@ -56,7 +55,6 @@ const AppLayout = ({ children, selectedKey }) => {
       >
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <div>
-            {/* Espaço para a logo */}
             <div style={{ padding: '16px', textAlign: 'center' }}>
               <img 
                 src={logo} 

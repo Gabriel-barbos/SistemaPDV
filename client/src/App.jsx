@@ -1,4 +1,3 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppLayout from "./AppLayout";
 import Caixa from "./pages/Caixa/Caixa";
@@ -12,10 +11,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Rota de Login */}
         <Route path="/" element={<Login />} />
 
-        {/* Rota de Caixa: Acessível para operador e admin */}
         <Route
           path="/caixa"
           element={
@@ -27,7 +24,6 @@ function App() {
           }
         />
 
-        {/* Rotas Exclusivas para Admin */}
         <Route
           path="/admin/estoque"
           element={
@@ -61,7 +57,6 @@ function App() {
           }
         />
 
-        {/* Rota de Acesso Negado */}
         <Route path="/unauthorized" element={<div>Acesso negado!</div>} />
       </Routes>
     </Router>
