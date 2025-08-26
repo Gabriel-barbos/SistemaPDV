@@ -42,7 +42,7 @@ function Relatorios() {
 
   // Busca os produtos para calcular o estoque
   useEffect(() => {
-    fetch('https://sistemapdv-2.onrender.com/products')
+    fetch('https://sistema-pdv-flax.vercel.app/products')
       .then(response => response.json())
       .then(data => {
         // Soma do custo dos produtos vezes a quantidade
@@ -67,7 +67,7 @@ function Relatorios() {
 
   // Busca as vendas e filtra por dia, mês e ano
   useEffect(() => {
-    fetch('https://sistemapdv-2.onrender.com/sales')
+    fetch('https://sistema-pdv-flax.vercel.app/sales')
       .then(response => response.json())
       .then(data => {
         const hoje = new Date();

@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, InputNumber, Upload, Row, Col, message } from 'antd';
-import { EditOutlined, DollarOutlined, FieldNumberOutlined,PlusOutlined, TagsOutlined, BarcodeOutlined, UploadOutlined } from '@ant-design/icons';
-import useProducts from '../pages/Produtos/useProducts';
+import {
+  EditOutlined,
+  DollarOutlined,
+  FieldNumberOutlined,
+  PlusOutlined,
+  TagsOutlined,
+  BarcodeOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 
-const ProductForm = () => {
-  const { createProduct, loading } = useProducts();
+const ProductForm = ({ onCreate, loading }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
@@ -25,14 +31,14 @@ const ProductForm = () => {
     formData.append('quantity', values.quantity);
     formData.append('code', values.code);
     formData.append('BarCode', values.BarCode);
-    formData.append('image', fileList[0].originFileObj); // Apenas um arquivo permitido
+    formData.append('image', fileList[0].originFileObj);
 
     try {
-      await createProduct(formData);
+      await onCreate(formData);
       message.success('Produto criado com sucesso!');
       form.resetFields();
       setFileList([]);
-    } catch (error) {
+    } catch {
       message.error('Erro ao criar produto.');
     }
   };
@@ -56,76 +62,50 @@ const ProductForm = () => {
               fileList={fileList}
               onChange={({ fileList }) => setFileList(fileList)}
             >
-              <Button icon={<UploadOutlined />}>Selecionar Imagem  PNG ou JPEG</Button>
+              <Button icon={<UploadOutlined />}>Selecionar Imagem PNG ou JPEG</Button>
             </Upload>
           </Form.Item>
         </Col>
 
         <Col span={24}>
-          <Form.Item
-            label="Nome do Produto"
-            name="name"
-            rules={[{ required: true, message: 'Por favor, insira o nome do produto!' }]}
-          >
+          <Form.Item label="Nome do Produto" name="name" rules={[{ required: true }]}>
             <Input prefix={<EditOutlined />} placeholder="Nome do Produto" />
           </Form.Item>
         </Col>
 
         <Col span={12}>
-          <Form.Item
-            label="Quantidade"
-            name="quantity"
-            rules={[{ required: true, message: 'Por favor, insira a quantidade do produto!' }]}
-            prefix={<FieldNumberOutlined />}
-          >
+          <Form.Item label="Quantidade" name="quantity" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} placeholder="Quantidade" />
           </Form.Item>
         </Col>
 
         <Col span={12}>
-          <Form.Item
-            label="Preço"
-            name="price"
-            rules={[{ required: true, message: 'Por favor, insira o preço do produto!' }]}
-          >
+          <Form.Item label="Preço" name="price" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} placeholder="Ex: 6.50" />
           </Form.Item>
         </Col>
 
         <Col span={12}>
-          <Form.Item
-            label="Custo"
-            name="cost"
-            rules={[{ required: true, message: 'Por favor, insira o custo do produto!' }]}
-          >
+          <Form.Item label="Custo" name="cost" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} placeholder="Custo" />
           </Form.Item>
         </Col>
 
         <Col span={12}>
-          <Form.Item
-            label="Código do Produto"
-            name="code"
-            rules={[{ required: true, message: 'Por favor, insira o código do produto!' }]}
-          >
+          <Form.Item label="Código do Produto" name="code" rules={[{ required: true }]}>
             <Input prefix={<TagsOutlined />} placeholder="Código do Produto" />
           </Form.Item>
         </Col>
 
         <Col span={24}>
-          <Form.Item
-            label="Código de Barras"
-            name="BarCode"
-            rules={[{ required: true, message: 'Por favor, insira o código de barras do produto!' }]}
-          >
+          <Form.Item label="Código de Barras" name="BarCode" rules={[{ required: true }]}>
             <Input prefix={<BarcodeOutlined />} placeholder="Código de Barras" />
           </Form.Item>
         </Col>
 
         <Col span={24}>
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }} loading={loading}
-            icon={<PlusOutlined />}>
+            <Button type="primary" htmlType="submit" style={{ width: '100%' }} loading={loading} icon={<PlusOutlined />}>
               Criar Produto
             </Button>
           </Form.Item>

@@ -9,19 +9,18 @@ import EmptyProduct from '../../assets/EmptyProduct.png'
 
 function ProductPage() {
   const [open, setOpen] = useState(false);
-  const { products, loading, error, createProduct } = useProducts(); // Hook para gerenciar os produtos
-  const [btnLoading, setBtnLoading] = useState(false); // Estado para controlar o loading do botão de criar
+  const { products, loading, error, createProduct, updateProduct, deleteProduct } = useProducts();
+  const [btnLoading, setBtnLoading] = useState(false);
 
   const showDrawer = () => setOpen(true);
   const onClose = () => setOpen(false);
 
   const handleCreateProduct = async (productData) => {
-    setBtnLoading(true); // Ativa o carregamento do botão
+    setBtnLoading(true);
     try {
-      await createProduct(productData); // Chama a função do hook para criar o produto
-      onClose(); // Fecha o Drawer após o produto ser criado
-    } catch (err) {
-      // Se ocorrer um erro, a variável btnLoading ficará falsa e o erro pode ser tratado
+      await createProduct(productData);
+      onClose();
+    } finally {
       setBtnLoading(false);
     }
   };
@@ -36,48 +35,50 @@ function ProductPage() {
         <Button
           type="primary"
           icon={<PlusCircleOutlined />}
-
           onClick={showDrawer}
-
         >
           Adicionar novo
         </Button>
       </div>
 
       <Drawer title="Cadastrar novo produto" onClose={onClose} open={open}>
-        <ProductForm onSubmit={handleCreateProduct} btnLoading={btnLoading} />
+        <ProductForm onCreate={handleCreateProduct} loading={btnLoading} />
       </Drawer>
 
-      {/* Exibir carregamento ou erro */}
       {loading && <Spin size="large" />}
       {error && <Alert message="Erro ao carregar produtos" type="error" showIcon />}
-
-
-
 
       <div className="product-list">
         {products.length > 0 ? (
           products.map((product) => (
-            <ProductCard key={product._id} product={product} />
+            <ProductCard
+              key={product._id}
+              product={product}
+              onUpdate={updateProduct}
+              onDelete={deleteProduct}
+            />
           ))
         ) : (
-          !loading &&
-
-          <div className="empty-purchase-list"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "10px"
-            }}>
-            <img
-              src={EmptyProduct}
-              alt="Nenhum item"
-              style={{ height: "100%", maxHeight: "100px", marginBottom: "5px" }}
-            />
-            <p style={{ fontSize: 20, fontWeight: 600 }}>Nenhum Produto adicionado</p>
-          </div>)}
+          !loading && (
+            <div
+              className="empty-purchase-list"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "10px",
+              }}
+            >
+              <img
+                src={EmptyProduct}
+                alt="Nenhum item"
+                style={{ height: "100%", maxHeight: "100px", marginBottom: "5px" }}
+              />
+              <p style={{ fontSize: 20, fontWeight: 600 }}>Nenhum Produto adicionado</p>
+            </div>
+          )
+        )}
       </div>
     </>
   );

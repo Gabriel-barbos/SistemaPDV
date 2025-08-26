@@ -14,7 +14,7 @@ const TodaySalesTable = () => {
   const fetchSales = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('https://sistemapdv-2.onrender.com/sales');
+      const { data } = await axios.get('https://sistema-pdv-flax.vercel.app/sales');
       // Filtra as vendas para exibir apenas as realizadas no dia de hoje
       const todaySales = data.filter((sale) => moment(sale.date).isSame(moment(), 'day'));
       setSales(todaySales);
