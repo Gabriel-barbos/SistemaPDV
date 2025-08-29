@@ -1,28 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Table, Tag } from 'antd';
-import axios from 'axios';
 import moment from 'moment';
 
-const GeneralTable = () => {
-  const [sales, setSales] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchSales();
-  }, []);
-
-  const fetchSales = async () => {
-    setLoading(true);
-    try {
-      const { data } = await axios.get('https://sistema-pdv-flax.vercel.app/sales');
-      setSales(data);
-    } catch (error) {
-      console.error('Erro ao buscar vendas:', error);
-    }
-    setLoading(false);
-  };
-
-  // Função para mapear cada método de pagamento a uma cor
+const GeneralTable = ({ sales = [], loading = false }) => {
   const getPaymentTagColor = (method) => {
     switch (method.toLowerCase()) {
       case 'dinheiro':
@@ -83,14 +63,7 @@ const GeneralTable = () => {
     },
   ];
 
-  return (
-    <Table
-      columns={columns}
-      dataSource={sales}
-      loading={loading}
-      rowKey={(record) => record._id}
-    />
-  );
+  return <Table columns={columns} dataSource={sales} loading={loading} rowKey={(record) => record._id} />;
 };
 
 export default GeneralTable;

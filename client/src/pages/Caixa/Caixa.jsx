@@ -116,13 +116,13 @@ function Caixa() {
     const data = { items, payment };
 
     try {
-      const response = await fetch("https://sistema-pdv-flax.vercel.app/sales", {
+      const response = await fetch("https://sistema-pdv-eight.vercel.app/sales", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      });
+      }); 
 
       if (!response.ok) {
         const errorData = await response.json();

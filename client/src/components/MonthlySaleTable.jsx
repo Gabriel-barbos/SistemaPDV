@@ -1,30 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Table, Tag } from 'antd';
-import axios from 'axios';
 import moment from 'moment';
 
-const MonthlySalesTable = () => {
-  const [sales, setSales] = useState([]);
-  const [loading, setLoading] = useState(false);
+const MonthlySalesTable = ({ sales = [], loading = false }) => {
+  const monthlySales = sales.filter((sale) => moment(sale.date).isSame(moment(), 'month'));
 
-  useEffect(() => {
-    fetchSales();
-  }, []);
-
-  const fetchSales = async () => {
-    setLoading(true);
-    try {
-      const { data } = await axios.get('https://sistema-pdv-flax.vercel.app/sales');
-      // Filtra as vendas para exibir somente as realizadas no mês atual
-      const monthlySales = data.filter((sale) => moment(sale.date).isSame(moment(), 'month'));
-      setSales(monthlySales);
-    } catch (error) {
-      console.error('Erro ao buscar vendas:', error);
-    }
-    setLoading(false);
-  };
-
-  // Função para mapear cada método de pagamento a uma cor
   const getPaymentTagColor = (method) => {
     switch (method.toLowerCase()) {
       case 'dinheiro':
@@ -85,14 +65,7 @@ const MonthlySalesTable = () => {
     },
   ];
 
-  return (
-    <Table
-      columns={columns}
-      dataSource={sales}
-      loading={loading}
-      rowKey={(record) => record._id}
-    />
-  );
+  return <Table columns={columns} dataSource={monthlySales} loading={loading} rowKey={(record) => record._id} />;
 };
 
 export default MonthlySalesTable;
