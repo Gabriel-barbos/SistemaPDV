@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { message } from 'antd';
 
-const API_URL = 'https://sistema-pdv-eight.vercel.app/products';
+const API_URL = 'https://sistemapdv-3.onrender.com/products';
 const CACHE_KEY = 'products_cache';
 const CACHE_TTL = 1000 * 60 * 5; // 5 minutos
 

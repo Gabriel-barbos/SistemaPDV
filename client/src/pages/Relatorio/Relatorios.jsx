@@ -24,7 +24,7 @@ function Relatorios() {
 
   // Busca os produtos para calcular o estoque
   useEffect(() => {
-    fetch('https://sistema-pdv-eight.vercel.app/products')
+    fetch('https://sistemapdv-3.onrender.com/products')
       .then(response => response.json())
       .then(data => {
         const totalEstoque = data.reduce((acc, produto) => acc + produto.cost * produto.quantity, 0);
@@ -45,7 +45,7 @@ function Relatorios() {
     const fetchSales = async () => {
       setLoadingSales(true);
       try {
-        const response = await fetch('https://sistema-pdv-eight.vercel.app/sales');
+        const response = await fetch('https://sistemapdv-3.onrender.com/sales');
         const data = await response.json();
         setSales(data); // salva o array completo para as tabelas
 
